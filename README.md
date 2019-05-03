@@ -4,6 +4,8 @@ Project done for the [MSc Big Data & Business Analytics from ESCP Europe](https:
 
 ### Launching project
 
+**Select your own branch on the top of this window, don't code on master !**
+
 Clone the repo in your computer using command
 ```markdown
 git clone https://github.com/ArthurMARIANI/Articles_Classifier.git
