@@ -1,0 +1,8 @@
+{
+    "files.exclude": {
+        "\"**/__pycache__\": true": true,
+        "\"**/*.pyc\": {\"when\": \"$(basename).py\"": true,
+        "**/.pyc": true
+    },
+    "python.pythonPath": "/usr/local/bin/python3"
+}
