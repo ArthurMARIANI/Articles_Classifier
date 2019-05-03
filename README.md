@@ -1,37 +1,38 @@
-## Welcome to GitHub Pages
+## Article Classifier
 
-You can use the [editor on GitHub](https://github.com/ArthurMARIANI/Articles_Classifier/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Project done for the [MSc Big Data & Business Analytics from ESCP Europe](https://www.escpeurope.eu/programmes/specialised-masters-MScs/MSc-in-Big-Data-and-Business-Analytics).
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Launching project
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
+Clone the repo in your computer using command
 ```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+git clone https://github.com/ArthurMARIANI/Articles_Classifier.git
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Go into the project and run 
+```markdown
+python3 main.py *number of articles of the txt file you want to scrap*
+```
+The result will be in the json file (located in files/)
 
-### Jekyll Themes
+### Configuration 
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ArthurMARIANI/Articles_Classifier/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+Check on the config.py file the path of the txt file containing the list of articles and the path you name you want for the result file (in json)
 
-### Support or Contact
+### Implementation 
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+You can add your own functions of extraction on models/articles.py
+It was configured to allow you to easy implement content.
+The schema should be this :
+
+    def extractAttribute(self, raw):
+          *** your code ***
+        return result
+        
+Naming should respect this schema of extract+Attribute(self, raw).
+Change "Attribute" by what you want to extract, it will be automaticaly implemented into the model.
+
+*raw* parameter is the full webpage, you can use BeautifulSoup of whaterver you like to parse it and find the element you want
+
+At the end, return the result of your algorithm to integrate it into the output file
+
