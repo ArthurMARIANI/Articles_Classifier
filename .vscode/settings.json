@@ -1,8 +1,23 @@
 {
-    "files.exclude": {
-        "\"**/__pycache__\": true": true,
-        "\"**/*.pyc\": {\"when\": \"$(basename).py\"": true,
-        "**/.pyc": true
+    "windowColors.internalSettings": {
+        "BaseColor": "hsl(198,12%, 30%)",
+        "portfolioAndColor": {
+            "portfolio": "Dusty",
+            "coloration": "hsl(198,12%, 30%)"
+        },
+        "useAutomatic": true,
+        "theme": "Dark (Monokai)"
     },
-    "python.pythonPath": "/usr/local/bin/python3"
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#466572",
+        "titleBar.inactiveBackground": "#3A545F",
+        "titleBar.activeForeground": "#FAFCFC",
+        "titleBar.inactiveForeground": "#ACB1B4",
+        "activityBar.background": "#3A545F",
+        "activityBar.foreground": "#F9FAFB",
+        "statusBar.background": "#30464F",
+        "statusBar.foreground": "#ffffff"
+    },
+    "workbench.colorTheme": "Dark (Monokai)",
+    "python.pythonPath": "/usr/local/opt/python/bin/python3.7"
 }
