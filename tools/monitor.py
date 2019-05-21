@@ -32,13 +32,14 @@ class Monitor(object):
         data = []
         if words:
             self.words_list.append(words)
-        percentiles_list = [0, 20, 40, 60, 80, 100]
-        percentiles = np.percentile(self.words_list, percentiles_list)
-        i = 0
-        for percentile in percentiles:
-            data.append([percentiles_list[i], int(percentile)])
-            i += 1
-        self.buildTable("Words", ["Percentile", "Number"], data)
+        if self.words_list:
+            percentiles_list = [0, 20, 40, 60, 80, 100]
+            percentiles = np.percentile(self.words_list, percentiles_list)
+            i = 0
+            for percentile in percentiles:
+                data.append([percentiles_list[i], int(percentile)])
+                i += 1
+            self.buildTable("Words", ["Percentile", "Number"], data)
 
     def appendStatus(self, code:int):
         data = []

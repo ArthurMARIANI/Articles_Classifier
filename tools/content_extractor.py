@@ -3,7 +3,7 @@ import re
 import string
 from .utils import Utils
 
-class Extractor(object):
+class ContentExtractor(object):
 
     @staticmethod
     def extractTitle(raw):
@@ -71,5 +71,5 @@ class Extractor(object):
         if raw.find('article'):
             section = raw.find('article')
         content = Utils.cleaner(section.find_all("p"))
-        
-        return content
+        content_text = '-'.join(content)
+        return content_text

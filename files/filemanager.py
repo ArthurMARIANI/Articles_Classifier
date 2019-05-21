@@ -19,4 +19,3 @@ class FilesManager(object):
         if (is_json):
             with open('files/'+config.path['json_result'], 'w') as f:
                 json.dump(content, f, ensure_ascii=False)
-

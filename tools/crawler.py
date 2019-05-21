@@ -25,7 +25,7 @@ class Crawler(object):
         ''' 
         Looping over the article_list file given as argument
         '''
-        start_time = time.time()
+        start_time = time.time() 
         articles = []
 
         i = 0
@@ -34,7 +34,6 @@ class Crawler(object):
             monitor.appendAdvance(i+1, self.number, elapsed_time)
             url = article_list.readline()
             article = self.getArticle(url)
-            print(i)
             if article:
                 monitor.appendWords(article.words)
                 articles.append(article.asJSON())
@@ -56,10 +55,7 @@ class Crawler(object):
             monitor.appendStatus(status)
             if status == 200:
                 article = Article(url, req)
-                print(article)
-                if raw:
-                    setattr(article, 'raw', str(req.text))
-                    fm.write(article.asJSON(), config.path['json_result'], True)
+                if raw:asJSON(), config.path['json_result'], True
                 return article
         except:
             time.sleep(0.5)
