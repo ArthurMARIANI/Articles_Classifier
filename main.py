@@ -1,27 +1,142 @@
-'''
-This is the main file, the one we are calling and which is launching the crawler
-'''
-
-import requests
-from tools.crawler import Crawler
-import sys
-import config
-from models.article import Article
-from pygments import highlight, lexers, formatters
+#! /usr/bin/env python3
+import argparse
 import json
+import time
+
+from bs4 import BeautifulSoup
+
+import config
+from crawler import Crawler
+from extractor import Extractor
+from models.article import Article
+from tools.filemanager import FilesManager
+from tools.monitor import Monitor
+from tools.utils import Utils
+
+fm = FilesManager()
+monitor = Monitor()
+crawler = Crawler(
+    monitor=monitor
+)
+
+def processArticle(article, res, url):
+    raw = BeautifulSoup(res.text, 'html.parser')
+    article.extractContent(raw,
+        attributes=[
+            "title",
+            "author",
+            "content"
+        ])
+
+    if article.content:
+        article.words = Utils.checkLength(article.content)
+
+    article.extractUrl(url,
+        attributes=[
+            "website",
+            "url_categories",
+        ])
+
+    article.summarize()
+
+    delattr(article, "content")
+    delattr(article, "url")
+    delattr(article, "title")
+    delattr(article, "author")
+    
+def run(args):
+    articles = []
+    start_time = time.time()
+    articles_list = fm.read(args.filename)
+    for i in range(args.number):
+        if args.url: url = args.url
+        else: url = articles_list.readline()
+        if not url:
+            return False
+        url = Utils.cleanUrl(url)
+        monitor.clearMonitor()
+        monitor.appendAdvance(
+            advance = i+1, 
+            total = args.number, 
+            time = round(time.time() - start_time, 1)
+        )
+        res = crawler.crawl(
+            url = url, 
+            debug = args.debug
+        )
+        
+        article = Article(
+            url=url,
+            monitor=monitor
+        )
+
+        if(isinstance(res, int)): 
+            article.status = res
+        else: 
+            processArticle(article, res, url)
+
+        article.index = i+1
+
+        if args.debug:
+            Utils.printJson(article.asJSON())
+        else:
+            monitor.updatePrint()
+
+        articles.append(article.asJSON())
+        fm.write(articles, config.path['json_result'], True)
+    monitor.updatePrint()
+    return True
 
 def main():
-    '''
-    Launcher of the app, should be launch using main.py *number of articles to scrap* *mode(optional, use d for debug)*
-    '''
-    mode = None
-    if len(sys.argv) > 2:
-        mode = sys.argv[2]
-    if sys.argv[1].isdigit():
-        Crawler(int(sys.argv[1]), mode)
-    else:
-        article = Crawler.getArticle(sys.argv[1], True)
-        colorful_json = highlight(
-            json.dumps(article, indent=2), lexers.JsonLexer(), formatters.TerminalFormatter())
-        print(colorful_json)
-main()
+    parser = argparse.ArgumentParser(
+        description="Articles Classifier"
+    )
+
+    parser.add_argument("-n", 
+        help = "number of articles you want to scrap",
+        dest = "number",
+        type = int,
+        default = 1,
+        required = False
+    )
+
+    parser.add_argument("-d", 
+        help = "activate debug mode",
+        action = "store_const",
+        dest = "debug", 
+        const = True, 
+        default = False,
+        required = False
+    )
+
+    parser.add_argument("-w",
+        help = "define each how many iterations you want to write",
+        dest="write",
+        type = int,
+        default = config.cache,
+        required = False
+    )
+    group = parser.add_mutually_exclusive_group()
+
+    group.add_argument("-url",
+        help = "url to scrap",
+        dest="url",
+        type = str,
+        required = False
+    )
+
+    group.add_argument("-list",
+        help = "name of txt file you want to process",
+        dest="filename",
+        type = str,
+        default = config.path['article_list'],
+        required = False
+    )
+
+
+    parser.set_defaults(func=run)
+    args = parser.parse_args()
+    args.func(args)
+
+if __name__ == "__main__":
+    main()

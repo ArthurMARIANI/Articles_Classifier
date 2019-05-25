@@ -2,16 +2,19 @@ from terminaltables import AsciiTable
 import os
 import numpy as np
 import time
+from tools.utils import Utils
 
 class Monitor(object):
     '''
     Contains attributes and fonction related to articles 
     [url, website, title, content, author]
     '''
+    utils = Utils()
 
     def __init__(self):
         self.to_print = []
         self.words_list = []
+        self.dic = {}
         self.status = {
             "total": 0,
             "success": 0,
@@ -48,7 +51,7 @@ class Monitor(object):
             self.status["success"] +=1
         else:
             self.status["errors"][code] += 1
-        data.append([200, self.status["success"], int(
+        data.append(["200 (success)", self.status["success"], int(
             self.status["success"]/self.status['total']*100)])
 
         for error in self.status["errors"]:
@@ -64,9 +67,13 @@ class Monitor(object):
         table = AsciiTable(table_data) 
         self.to_print.append('\n'+'+ '+title.upper())
         self.to_print.append(table.table)
+        
+    def clearMonitor(self):
+        self.to_print = []
 
     def updatePrint(self):
         os.system('cls' if os.name == 'nt' else 'clear')
         for e in self.to_print:
             print(e)
-        self.to_print = []
+        
+        
