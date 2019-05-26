@@ -3,8 +3,6 @@ import time
 
 import requests
 
-import config
-from models.article import Article
 from tools.monitor import Monitor
 
 class Crawler(object):
@@ -12,14 +10,18 @@ class Crawler(object):
     def __init__(self, monitor: Monitor):
         self.monitor = monitor
 
-    def crawl(self, url: str, debug: bool = False) -> Article:
+    def crawl(self, url: str, debug: bool = False):
         req = self.getArticle(url)
-        status = req.status_code
-        self.monitor.appendStatus(code=status)
-        if status is 200:
-            return req 
+        if(hasattr(req, "status_code")):
+            status = req.status_code
+            self.monitor.appendStatus(code=status)
+            if status is 200:
+                return req 
+            else:
+                return status
         else:
-            return status
+            self.monitor.appendStatus(code=404)
+            return None
     
     def getArticle(self, url:str) -> object:
 
@@ -33,12 +35,14 @@ class Crawler(object):
             'Connection': 'keep-alive',
         }
 
-        req = requests.get(
-            url="http://"+url, 
-            allow_redirects=True,
-            headers=headers
-        )
+        try:
+            req = requests.get(
+                url="http://"+url, 
+                allow_redirects=True,
+                headers=headers
+            )
+            return req
 
-        return req
-
+        except:
+            return None
         

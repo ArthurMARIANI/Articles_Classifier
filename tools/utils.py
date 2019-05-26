@@ -74,10 +74,11 @@ class Utils(object):
 
     @staticmethod
     def clean(text):
+        text = text.lower()
         text = re.sub(r"d'", '', text)
         text = re.sub(r"l'", '', text)
-        text = re.sub("\.\.\.", "", text)
-        text = text.translate(str.maketrans('', '', string.punctuation))
+        text = re.sub("\.\.\.", "", text)        
+        text = text.translate(str.maketrans(' ', ' ', string.punctuation))
         text = unidecode.unidecode(text)
         return text
 
@@ -91,7 +92,7 @@ class Utils(object):
     @staticmethod
     def normalize(obj, total):
         for e in obj:
-            val = round(math.log(obj[e]/total*100),1)
+            val = round(obj[e]/total*100,1)
             if val > 1:
-                obj[e] = val
+                obj[e] = round(math.log(val), 1)
         return dict(obj)

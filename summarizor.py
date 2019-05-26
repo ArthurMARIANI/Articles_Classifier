@@ -1,12 +1,11 @@
 import config
 from os import path
 from tools.filemanager import FilesManager
-import nltk
-import spacy
 from collections import Counter
 from tools.utils import Utils
 import math
 import re
+from spacy.lang.fr import French
 
 fm = FilesManager()
 
@@ -16,7 +15,9 @@ class Summarizor(object):
         self.stopwords = self.load_stopwords('fr')
         self.title = title
         self.content = content
-        self.spacy = spacy.load('fr_core_news_sm')
+        language = French()
+        self.spacy = language.from_disk('spacy')
+
 
     def normalize(self, attribute):
         text = getattr(self, attribute)
@@ -37,7 +38,7 @@ class Summarizor(object):
         if title_keywords and content_keywords:
             keywords = Utils.merge_two_dicts(title_keywords[0], content_keywords[0])
             keywords = Utils.sortDictionary(keywords)
-            return Utils.normalize(keywords, title_keywords[1]+content_keywords[1])
+            return Utils.normalize(keywords, 20)
         else:
             return None
 
@@ -66,9 +67,10 @@ class Summarizor(object):
             total = 0
             
             for k in keywords:
-                articleScore = keywords[k]**20
-                score = round(math.log(articleScore*len(keywords)/math.log(num_words)))
-
+                articleScore = math.log((keywords[k]*2)**2)+1
+                length = math.log(num_words / len(keywords))+1
+                score = articleScore/length
+                
                 total += score
                 keywords[k] = score
             return [dict(keywords), total]
@@ -81,3 +83,6 @@ class Summarizor(object):
                                          'stopwords-{}.txt'.format(language))) as f:
             stopwords.update(set([w.strip() for w in f.readlines()]))
         return stopwords
+
+
+

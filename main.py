@@ -20,29 +20,28 @@ crawler = Crawler(
 )
 
 def processArticle(article, res, url):
-    raw = BeautifulSoup(res.text, 'html.parser')
-    article.extractContent(raw,
-        attributes=[
-            "title",
-            "author",
-            "content"
-        ])
+    if(hasattr(res, "text")):
+        raw = BeautifulSoup(res.text, 'html.parser')
+        article.extractContent(raw,
+            attributes=[
+                "title",
+                "author",
+                "content"
+            ])
 
-    if article.content:
-        article.words = Utils.checkLength(article.content)
+        if article.content:
+            article.words = Utils.checkLength(article.content)
 
-    article.extractUrl(url,
-        attributes=[
-            "website",
-            "url_categories",
-        ])
+        article.extractUrl(url,
+            attributes=[
+                "website",
+                "url_categories",
+            ])
 
-    article.summarize()
+        article.summarize()
 
-    delattr(article, "content")
-    delattr(article, "url")
-    delattr(article, "title")
-    delattr(article, "author")
+        delattr(article, "content")
+        delattr(article, "author")
     
 def run(args):
     articles = []
@@ -53,8 +52,9 @@ def run(args):
         else: url = articles_list.readline()
         if not url:
             return False
-        url = Utils.cleanUrl(url)
+        url = Utils.cleanUrl(url) 
         monitor.clearMonitor()
+        monitor.appendUrl(url)
         monitor.appendAdvance(
             advance = i+1, 
             total = args.number, 
@@ -72,9 +72,14 @@ def run(args):
 
         if(isinstance(res, int)): 
             article.status = res
+            monitor.appendWords(None)
         else: 
             processArticle(article, res, url)
-
+            if hasattr(article, 'words'):
+                monitor.appendWords(article.words)
+            else:
+                monitor.appendWords(None)
+                
         article.index = i+1
 
         if args.debug:
