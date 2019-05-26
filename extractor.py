@@ -30,7 +30,7 @@ class Extractor(object):
         title = None
 
         title_element = raw.title
-        if title_element:
+        if title_element.string:
             title = title_element.string.lower()
 
         else:

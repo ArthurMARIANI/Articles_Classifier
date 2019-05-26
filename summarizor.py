@@ -79,7 +79,7 @@ class Summarizor(object):
 
     def load_stopwords(self, language):
         stopwords = set()
-        with fm.read(path.join(config.path['stopwords_folder'],
+        with fm.read(path.join("./",config.path['stopwords_folder'],
                                          'stopwords-{}.txt'.format(language))) as f:
             stopwords.update(set([w.strip() for w in f.readlines()]))
         return stopwords

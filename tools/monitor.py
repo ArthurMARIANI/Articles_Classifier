@@ -39,7 +39,7 @@ class Monitor(object):
         if words:
             self.words_list.append(words)
         if self.words_list:
-            percentiles_list = [0, 30, 60, ,100]
+            percentiles_list = [0, 30, 60 ,100]
             percentiles = np.percentile(self.words_list, percentiles_list)
             i = 0
             for percentile in percentiles:
