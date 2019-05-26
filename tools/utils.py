@@ -5,8 +5,16 @@ import re
 import unidecode
 import math
 
+from tools.filemanager import FilesManager
+from tools.monitor import Monitor
+
 
 class Utils(object):
+
+    def __init__(self):
+        self.monitor = Monitor()
+        self.filesmanager = FilesManager("Articles_Classifier")
+
     @staticmethod
     def cleaner(elements: list):
         """

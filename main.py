@@ -5,19 +5,17 @@ import time
 
 from bs4 import BeautifulSoup
 
+from models.article import Article
+
 import config
 from crawler import Crawler
 from extractor import Extractor
-from models.article import Article
 from tools.filemanager import FilesManager
 from tools.monitor import Monitor
 from tools.utils import Utils
 
-fm = FilesManager("Articles_Classifier")
-monitor = Monitor()
-crawler = Crawler(
-    monitor=monitor
-)
+crawler = Crawler()
+utils = Utils()
 
 def processArticle(article, res, url):
     if(hasattr(res, "text")):
@@ -46,16 +44,16 @@ def processArticle(article, res, url):
 def run(args):
     articles = []
     start_time = time.time()
-    articles_list = fm.read(args.filename)
+    articles_list = utils.filesmanager.read(args.filename)
     for i in range(args.number):
         if args.url: url = args.url
         else: url = articles_list.readline()
         if not url:
             return False
         url = Utils.cleanUrl(url) 
-        monitor.clearMonitor()
-        monitor.appendUrl(url)
-        monitor.appendAdvance(
+        utils.monitor.clearMonitor()
+        utils.monitor.appendUrl(url)
+        utils.monitor.appendAdvance(
             advance = i+1, 
             total = args.number, 
             time = round(time.time() - start_time, 1)
@@ -67,29 +65,28 @@ def run(args):
         
         article = Article(
             url=url,
-            monitor=monitor
         )
 
         if(isinstance(res, int)): 
             article.status = res
-            monitor.appendWords(None)
+            utils.monitor.appendWords(None)
         else: 
             processArticle(article, res, url)
             if hasattr(article, 'words'):
-                monitor.appendWords(article.words)
+                utils.monitor.appendWords(article.words)
             else:
-                monitor.appendWords(None)
+                utils.monitor.appendWords(None)
 
         article.index = i+1
 
         if args.debug:
             Utils.printJson(article.asJSON())
         else:
-            monitor.updatePrint()
+            utils.monitor.updatePrint()
 
         articles.append(article.asJSON())
-        fm.write(articles, config.path['json_result'], True)
-    monitor.updatePrint()
+        utils.filesmanager.write(articles, config.path['json_result'], True)
+    utils.monitor.updatePrint()
     return True
 
 def main():

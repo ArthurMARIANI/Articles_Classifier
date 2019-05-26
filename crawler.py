@@ -2,19 +2,21 @@ import json
 import time
 
 import requests
+import config
 
-from tools.monitor import Monitor
+from tools.utils import Utils
+utils = Utils()
 
 class Crawler(object):
 
-    def __init__(self, monitor: Monitor):
-        self.monitor = monitor
+    def __init__(self):
+        self.monitor = utils.monitor
 
     def crawl(self, url: str, debug: bool = False):
         req = self.getArticle(url)
         if(hasattr(req, "status_code")):
             status = req.status_code
-            self.monitor.appendStatus(code=status)
+            utils.monitor.appendStatus(code=status)
             if status is 200:
                 return req 
             else:

@@ -2,6 +2,8 @@
 '''
 Here is the configuration of the several path and the mode we want to use
 '''
+
+
 path = {
     "article_list": "topicdata.txt", #list of articles (the one given)
     "json_result": "articles.json", #the json where to export the result
@@ -9,7 +11,6 @@ path = {
 }
 mode = "test" #test or full
 cache = 1
-
 
 sentence_importance  = {
     0: 0,

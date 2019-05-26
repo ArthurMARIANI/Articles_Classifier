@@ -1,13 +1,14 @@
 import config
 from os import path
-from tools.filemanager import FilesManager
 from collections import Counter
 from tools.utils import Utils
 import math
+import spacy
 import re
 from spacy.lang.fr import French
 
-fm = FilesManager()
+from tools.utils import Utils
+utils = Utils ()
 
 class Summarizor(object):
    
@@ -15,9 +16,7 @@ class Summarizor(object):
         self.stopwords = self.load_stopwords('fr')
         self.title = title
         self.content = content
-        language = French()
-        self.spacy = language.from_disk('spacy')
-
+        self.spacy = spacy.load("fr_core_news_sm")
 
     def normalize(self, attribute):
         text = getattr(self, attribute)
@@ -79,10 +78,9 @@ class Summarizor(object):
 
     def load_stopwords(self, language):
         stopwords = set()
-        with fm.read(path.join("./",config.path['stopwords_folder'],
+        with utils.filesmanager.read(path.join(config.path['stopwords_folder'],
                                          'stopwords-{}.txt'.format(language))) as f:
             stopwords.update(set([w.strip() for w in f.readlines()]))
         return stopwords
-
 
 
