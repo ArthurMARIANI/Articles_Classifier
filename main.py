@@ -13,7 +13,7 @@ from tools.filemanager import FilesManager
 from tools.monitor import Monitor
 from tools.utils import Utils
 
-fm = FilesManager()
+fm = FilesManager("Articles_Classifier")
 monitor = Monitor()
 crawler = Crawler(
     monitor=monitor
@@ -79,7 +79,7 @@ def run(args):
                 monitor.appendWords(article.words)
             else:
                 monitor.appendWords(None)
-                
+
         article.index = i+1
 
         if args.debug:
