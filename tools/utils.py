@@ -15,7 +15,7 @@ class Utils(object):
     __shared_state = {}
     def __init__(self):
         self.__dict__ = self.__shared_state
-        self.filesmanager = FilesManager("Articles_Classifier")
+        self.filesmanager = FilesManager()
 
     @staticmethod
     def cleaner(elements: list):
