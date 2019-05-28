@@ -6,6 +6,7 @@ import unidecode
 import math
 import config
 import nlp_config
+import multiprocessing
 
 from os import path
 
