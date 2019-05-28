@@ -2,6 +2,16 @@
 
 Project done for the [MSc Big Data & Business Analytics from ESCP Europe](https://www.escpeurope.eu/programmes/specialised-masters-MScs/MSc-in-Big-Data-and-Business-Analytics).
 
+### Prerequis
+Install packages
+```markdown
+
+pip3 install terminaltables 
+pip3 install unidecode 
+pip3 install spacy 
+pip3 install bs4 
+```
+
 ### Launching project
 
 #**Select your own branch on the top of this window, don't code on master !**#
