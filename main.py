@@ -24,7 +24,7 @@ topics = {}
 
 def run(args):
     queue = manager.Queue()
-    pool = mp.Pool(processes = 8)
+    pool = mp.Pool(processes=multiprocessing.cpu_count())
     articles_list = utils.filesmanager.read(args.filename).readlines()
     if args.url:
         articles_list = [args.url]
