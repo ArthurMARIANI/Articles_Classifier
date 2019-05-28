@@ -14,6 +14,7 @@ import queue
 from collections import OrderedDict
 from operator import itemgetter
 import itertools
+import multiprocessing
 
 crawler = Crawler()
 utils = Utils()
