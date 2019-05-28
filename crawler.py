@@ -1,32 +1,38 @@
-import json
-import time
-
 import requests
+from tools.utils import Utils
+from models.article import Article
+import time
 import config
 
-from tools.utils import Utils
+from bs4 import BeautifulSoup
+
 utils = Utils()
 
 class Crawler(object):
 
-    def __init__(self):
-        self.monitor = utils.monitor
+    def crawl(self, article, res):
 
-    def crawl(self, url: str, debug: bool = False):
-        req = self.getArticle(url)
-        if(hasattr(req, "status_code")):
-            status = req.status_code
-            utils.monitor.appendStatus(code=status)
-            if status is 200:
-                return req 
-            else:
-                return status
-        else:
-            self.monitor.appendStatus(code=404)
-            return None
+        raw = BeautifulSoup(res.text, 'html.parser')
+        article.extractContent(raw, attributes=[
+            "title",
+            "author",
+            "content"
+        ])
+        if article.content:
+            article.words = Utils.checkLength(article.content)
+            article.extractUrl(article.url,
+                                attributes=[
+                                    "website",
+                                    "url_categories",
+                                ])
+            article.summarize()
+            delattr(article, "content")
+            if not config.debug:
+                Utils.printJson(article.asJSON())
+        return article
     
-    def getArticle(self, url:str) -> object:
-
+    def getArticle(self, url) -> object:
+        url = utils.cleanUrl(url)
         headers = {
             'Accept-Encoding': 'gzip, deflate, sdch',
             'Accept-Language': 'en-US,en;q=0.8',
@@ -36,15 +42,10 @@ class Crawler(object):
             'Cache-Control': 'max-age=0',
             'Connection': 'keep-alive',
         }
-
-        try:
-            req = requests.get(
-                url="http://"+url, 
-                allow_redirects=True,
-                headers=headers
-            )
-            return req
-
-        except:
-            return None
+        res = requests.get(
+            url="http://"+url, 
+            allow_redirects=True,
+            headers=headers
+        )
+        return res
         

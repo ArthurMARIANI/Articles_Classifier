@@ -4,15 +4,17 @@ from pygments import formatters, highlight, lexers
 import re
 import unidecode
 import math
+import config
+import nlp_config
+
+from os import path
 
 from tools.filemanager import FilesManager
-from tools.monitor import Monitor
-
 
 class Utils(object):
-
+    __shared_state = {}
     def __init__(self):
-        self.monitor = Monitor()
+        self.__dict__ = self.__shared_state
         self.filesmanager = FilesManager("Articles_Classifier")
 
     @staticmethod
@@ -81,6 +83,25 @@ class Utils(object):
         return dic
 
     @staticmethod
+    def isWord(text):
+        if text in nlp_config.rejected:
+            text = False
+        if (text in nlp_config.synonimous):
+            text = nlp_config.synonimous[text]
+        if text:
+            pattern = re.compile(
+                r"([0-9])|(\.)|(\-)|(\s+)")
+            if not pattern.search(text) and text and len(text)>3:
+                return text
+            else:
+                return False
+
+        #print(re.match(r"l'", '', text))
+        #print(re.match("\.\.\.", "", text))
+
+
+
+    @staticmethod
     def clean(text):
         text = text.lower()
         text = re.sub(r"d'", '', text)
@@ -104,3 +125,10 @@ class Utils(object):
             if val > 1:
                 obj[e] = round(math.log(val), 1)
         return dict(obj)
+
+    def load_stopwords(self, language):
+        stopwords = set()
+        with self.filesmanager.read(path.join(config.path['stopwords_folder'],
+                                            'stopwords-{}.txt'.format(language))) as f:
+            stopwords.update(set([w.strip() for w in f.readlines()]))
+        return stopwords

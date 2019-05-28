@@ -2,7 +2,6 @@ import json
 import config
 import os
 
-
 class FilesManager(object):
     '''
     Allows readingg and writing files located on ./files folder

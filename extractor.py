@@ -1,8 +1,4 @@
-from bs4 import BeautifulSoup
-import re
-import string
 from tools.utils import Utils
-
 class Extractor(object):
 
     @staticmethod
@@ -14,10 +10,9 @@ class Extractor(object):
     @staticmethod
     def url_categories(url):
         parsed_url = url.split("/")
-        url_categories = []
-        for i in range(len(parsed_url)-1):
-            url_categories.append(parsed_url[i+1])
-        return url_categories
+        if len(parsed_url)>1:
+            cat = Utils.isWord(parsed_url[1])
+            return cat
 
     @staticmethod
     def title(raw):
@@ -28,9 +23,8 @@ class Extractor(object):
         """
 
         title = None
-
         title_element = raw.title
-        if title_element.string:
+        if title_element and title_element.string:
             title = title_element.string.lower()
 
         else:

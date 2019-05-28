@@ -1,32 +1,28 @@
 import config
 from os import path
-from collections import Counter
-from tools.utils import Utils
 import math
-import spacy
-import re
 from spacy.lang.fr import French
 
 from tools.utils import Utils
 utils = Utils ()
+spacy = French()
+stopwords = utils.load_stopwords('fr')
 
 class Summarizor(object):
    
     def __init__(self, title, content):
-        self.stopwords = self.load_stopwords('fr')
         self.title = title
         self.content = content
-        self.spacy = spacy.load("fr_core_news_sm")
 
     def normalize(self, attribute):
         text = getattr(self, attribute)
         if text:
             text = Utils.clean(text)
             result = []
-            doc = self.spacy(text)
+            doc = spacy(text)
             for token in doc:
                 if not token.is_stop:
-                    if token.lemma_ not in self.stopwords and token.lemma_.isalpha():
+                    if token.lemma_ not in stopwords and token.lemma_.isalpha():
                         result.append(token.lemma_)
             setattr(self, attribute, result)
         
@@ -75,12 +71,3 @@ class Summarizor(object):
             return [dict(keywords), total]
         else:
             return None
-
-    def load_stopwords(self, language):
-        stopwords = set()
-        with utils.filesmanager.read(path.join(config.path['stopwords_folder'],
-                                         'stopwords-{}.txt'.format(language))) as f:
-            stopwords.update(set([w.strip() for w in f.readlines()]))
-        return stopwords
-
-

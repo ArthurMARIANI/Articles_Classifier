@@ -1,5 +1,3 @@
-from bs4 import BeautifulSoup
-import re
 from extractor import Extractor
 from summarizor import Summarizor
 from tools.utils import Utils
@@ -10,9 +8,10 @@ class Article(object):
     [url, website, title, content, author]
     '''
 
-    def __init__(self, url: str):
+    def __init__(self, url: str, status:int, index:int):
+        self.index = index
         self.url:str = url
-        self.status:int
+        self.status:int = status
         self.website:str
         self.url_categories:list
         self.author:str
@@ -22,7 +21,6 @@ class Article(object):
         self.keywords:list
         self.summary:str
         self.index:int
-
 
     def extractContent(self, raw, attributes):
         for attribute in attributes:
