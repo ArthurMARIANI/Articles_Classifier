@@ -96,11 +96,6 @@ class Utils(object):
             else:
                 return False
 
-        #print(re.match(r"l'", '', text))
-        #print(re.match("\.\.\.", "", text))
-
-
-
     @staticmethod
     def clean(text):
         text = text.lower()

@@ -36,12 +36,9 @@ class Crawler(object):
                                     "topic",
                                 ])
             article.summarize()
-            if not config.debug: Utils.printJson(article.asJSON())
             delattr(article, "content")
+            if not config.debug: Utils.printJson(article.asJSON())
         self.articles.append(article.asJSON())
-        if hasattr(article, 'topic') and article.topic:
-            topic = article.topic
-            return topic
     
     def getArticle(self, url) -> object:
         url = utils.cleanUrl(url)

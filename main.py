@@ -28,7 +28,8 @@ def run(args):
     existing_articles = crawler.existing_articles
     pool = mp.Pool(processes=multiprocessing.cpu_count())
     articles_list = utils.filesmanager.read(args.filename).readlines()
-    config.iterations = min(args.number, len(articles_list)) - existing_articles
+    target = min(args.number, len(articles_list))
+    config.iterations = target - existing_articles
     if config.iterations > 0:
         if args.url:
             articles_list = [args.url]
@@ -41,16 +42,15 @@ def run(args):
                 callback=processTreatment)
         pool.close()
         pool.join()
-        crawler.articles[0]['number'] = config.iterations
     classifier.extractTopicKeys(crawler.articles)
+    classifier.filterTopics(args.topics)
     classifier.normalizeTopics()
-    utils.filesmanager.write({"number": 100,
+    classifier.predictTopic()
+    utils.filesmanager.write({"number": target,
                               "articles": crawler.articles
                               }, 
                               config.path['json_result'], True
         )
-
-
 
 def processRequest(queue, i, article_url):
     res = crawler.getArticle(article_url)
@@ -67,12 +67,11 @@ def processTreatment(queue):
         res = element['res']
         article = Article(
             index=element['index'],
-            url=Utils.cleanUrl(res.url),
+            url=res.url,
             status=res.status_code
         )
         if article.status == 200:
-            topic = crawler.crawl(article, res)
-            classifier.appendTopic(topic)
+            crawler.crawl(article, res)
         break
 
 def main():

@@ -26,14 +26,13 @@ class Summarizor(object):
                         result.append(token.lemma_)
             setattr(self, attribute, result)
         
-
     def keywords(self):
         title_keywords = self.getKeywords(self.title)
         content_keywords = self.getKeywords(self.content)
         if title_keywords and content_keywords:
             keywords = Utils.merge_two_dicts(title_keywords[0], content_keywords[0])
             keywords = Utils.sortDictionary(keywords)
-            return Utils.normalize(keywords, 20)
+            return Utils.normalize(keywords, 4)
         else:
             return None
 
