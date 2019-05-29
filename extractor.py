@@ -25,15 +25,13 @@ class Extractor(object):
 
         title_element = raw.title
         if title_element and title_element.string:
-            title = title_element.string.lower()
+            return title_element.string.lower()
 
         else:
             titles_text_H1 = [tag.string for tag in raw.find_all('h1')]
             if titles_text_H1:
                 titles_text_H1.sort(key=len, reverse=True)
-                title = titles_text_H1[0]
-        if title:
-            return title
+                return titles_text_H1[0]
 
     @staticmethod
     def author(raw):

@@ -38,8 +38,11 @@ class Article(object):
                 setattr(self, attribute, res)
 
     def summarize(self):
+        title = ''
+        if hasattr(self, 'title'):
+            title = self.title
         summarizor = Summarizor(
-            title=self.title, content=self.content)
+            title=title, content=self.content)
         summarizor.normalize("title")
         summarizor.normalize("content")
         self.keywords = summarizor.keywords()
