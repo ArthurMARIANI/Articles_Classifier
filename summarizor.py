@@ -41,7 +41,7 @@ class Summarizor(object):
         get the most used keywords
         """
         if text:
-            NUM_KEYWORDS = 20
+            NUM_KEYWORDS = config.keywords_to_extract
 
             freq = {}
             num_words = len(text)

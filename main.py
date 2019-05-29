@@ -42,10 +42,12 @@ def run(args):
                 callback=processTreatment)
         pool.close()
         pool.join()
-    classifier.extractTopicKeys(crawler.articles)
+    classifier.extractTopics(crawler.articles, args.keywords)
     classifier.filterTopics(args.topics)
-    classifier.normalizeTopics()
-    classifier.predictTopic()
+    classifier.extractTopicsFromKeywords(crawler.articles)
+    classifier.normalizeKeywords()
+    classifier.predictTopic(crawler.articles)
+    classifier.score(crawler.articles)
     utils.filesmanager.write({"number": target,
                               "articles": crawler.articles
                               }, 
@@ -65,7 +67,7 @@ def processTreatment(queue):
     while True:
         element = queue.get()
         res = element['res']
-        article = Article(
+        article = Article( 
             index=element['index'],
             url=res.url,
             status=res.status_code
@@ -99,6 +101,13 @@ def main():
     parser.add_argument("-t", 
         help = "number of topics expected",
         dest = "topics", 
+        default = 10,
+        required = False
+    )
+
+    parser.add_argument("-k", 
+        help = "number of keywords to use",
+        dest = "keywords", 
         default = 10,
         required = False
     )

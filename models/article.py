@@ -10,10 +10,11 @@ class Article(object):
 
     def __init__(self, url: str, status:int, index:int):
         self.index = index
-        self.url:str = url
+        self.url:str = Utils.cleanUrl(url)
         self.status:int = status
         self.website:str
-        self.topic:list = None
+        self.topic:list
+        self.predicted_topic:str 
         self.author:str
         self.content:str = None
         self.title:str = None
