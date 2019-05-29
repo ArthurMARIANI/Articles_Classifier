@@ -1,8 +1,8 @@
 import requests
 from tools.utils import Utils
-from models.article import Article
 import time
 import config
+import json
 
 from bs4 import BeautifulSoup
 
@@ -10,8 +10,18 @@ utils = Utils()
 
 class Crawler(object):
 
+    def __init__(self):
+        json_file = open('articles.json').read()
+        if json_file:
+            previous_articles = json.loads(json_file)
+            self.existing_articles = previous_articles['number']
+            self.articles = previous_articles['articles']
+        else: 
+            self.existing_articles = 0
+            self.articles = []
+            
     def crawl(self, article, res):
-
+        from models.article import Article
         raw = BeautifulSoup(res.text, 'html.parser')
         article.extractContent(raw, attributes=[
             "title",
@@ -23,13 +33,15 @@ class Crawler(object):
             article.extractUrl(article.url,
                                 attributes=[
                                     "website",
-                                    "url_categories",
+                                    "topic",
                                 ])
             article.summarize()
+            if not config.debug: Utils.printJson(article.asJSON())
             delattr(article, "content")
-            if not config.debug:
-                Utils.printJson(article.asJSON())
-        return article
+        self.articles.append(article.asJSON())
+        if hasattr(article, 'topic') and article.topic:
+            topic = article.topic
+            return topic
     
     def getArticle(self, url) -> object:
         url = utils.cleanUrl(url)

@@ -13,7 +13,7 @@ class Article(object):
         self.url:str = url
         self.status:int = status
         self.website:str
-        self.url_categories:list
+        self.topic:list = None
         self.author:str
         self.content:str = None
         self.title:str = None

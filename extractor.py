@@ -8,11 +8,11 @@ class Extractor(object):
         return website
 
     @staticmethod
-    def url_categories(url):
+    def topic(url):
         parsed_url = url.split("/")
         if len(parsed_url)>1:
-            cat = Utils.isWord(parsed_url[1])
-            return cat
+            topic = Utils.isWord(parsed_url[1])
+            return topic
 
     @staticmethod
     def title(raw):

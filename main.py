@@ -8,6 +8,7 @@ from models.article import Article
 
 import config
 from crawler import Crawler
+from classifier import Classifier
 from tools.utils import Utils
 import multiprocessing as mp
 import queue
@@ -15,40 +16,40 @@ from collections import OrderedDict
 from operator import itemgetter
 import itertools
 import multiprocessing
+import numpy as np
 
-crawler = Crawler()
 utils = Utils()
 manager = mp.Manager()
-
-articles = []
-topics = {}
+crawler = Crawler()
+classifier = Classifier()
 
 def run(args):
     queue = manager.Queue()
+    existing_articles = crawler.existing_articles
     pool = mp.Pool(processes=multiprocessing.cpu_count())
     articles_list = utils.filesmanager.read(args.filename).readlines()
-    if args.url:
-        articles_list = [args.url]
-    config.iterations = min(args.number, len(articles_list))
-    for i in range(config.iterations):
-        article_url = articles_list[i]
-        pool.apply_async(
-            processRequest, 
-            args=(queue, i, article_url), 
-            callback=processTreatment)
-    pool.close()
-    pool.join()
-    sortedtopics = OrderedDict(
-        sorted(topics.items(), key=itemgetter(1), reverse=True))
-    x = itertools.islice(sortedtopics.items(), 0, int(args.topics))
-    total = 0
-    for key, value in x:
-        total += value
-        print(key, value)
-    print('-------')
-    print(str(total) + '/' + str(args.number))
-    utils.filesmanager.write(
-        articles, config.path['json_result'], True)
+    config.iterations = min(args.number, len(articles_list)) - existing_articles
+    if config.iterations > 0:
+        if args.url:
+            articles_list = [args.url]
+        for i in range(config.iterations):
+            index = i+existing_articles
+            article_url = articles_list[index]
+            pool.apply_async(
+                processRequest, 
+                args=(queue, index, article_url),
+                callback=processTreatment)
+        pool.close()
+        pool.join()
+        crawler.articles[0]['number'] = config.iterations
+    classifier.extractTopicKeys(crawler.articles)
+    classifier.normalizeTopics()
+    utils.filesmanager.write({"number": 100,
+                              "articles": crawler.articles
+                              }, 
+                              config.path['json_result'], True
+        )
+
 
 
 def processRequest(queue, i, article_url):
@@ -70,15 +71,8 @@ def processTreatment(queue):
             status=res.status_code
         )
         if article.status == 200:
-            article = crawler.crawl(article, res)
-            if hasattr(article, 'url_categories') and article.url_categories:
-                cat = article.url_categories
-                if not cat in topics:
-                    topics[cat] = 1
-                else :
-                    topics[cat] += 1 
-
-        articles.append(article.asJSON())
+            topic = crawler.crawl(article, res)
+            classifier.appendTopic(topic)
         break
 
 def main():

@@ -11,8 +11,6 @@ class FilesManager(object):
         self.ROOT_DIR = os.path.abspath(os.curdir)
         if dirpath:
             self.ROOT_DIR += ('/'+ dirpath)
-        open(self.ROOT_DIR+'/'+config.path['json_result'],
-             "w").close()  # clean json result file
 
     def read(self, filename: str):
         file = open(self.ROOT_DIR+'/'+filename, 'r')
