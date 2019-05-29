@@ -32,7 +32,8 @@ class Extractor(object):
             if titles_text_H1:
                 titles_text_H1.sort(key=len, reverse=True)
                 title = titles_text_H1[0]
-        return title
+        if title:
+            return title
 
     @staticmethod
     def author(raw):
