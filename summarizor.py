@@ -33,8 +33,6 @@ class Summarizor(object):
             keywords = Utils.merge_two_dicts(title_keywords[0], content_keywords[0])
             keywords = Utils.sortDictionary(keywords)
             return Utils.normalize(keywords, 4)
-        else:
-            return None
 
     def getKeywords(self, text):
         """
@@ -68,5 +66,3 @@ class Summarizor(object):
                 total += score
                 keywords[k] = score
             return [dict(keywords), total]
-        else:
-            return None

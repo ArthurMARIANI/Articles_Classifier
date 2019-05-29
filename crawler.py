@@ -28,7 +28,7 @@ class Crawler(object):
             "author",
             "content"
         ])
-        if article.content:
+        if hasattr(article, 'content'):
             article.words = Utils.checkLength(article.content)
             article.extractUrl(article.url,
                                 attributes=[

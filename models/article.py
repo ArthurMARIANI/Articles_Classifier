@@ -16,8 +16,8 @@ class Article(object):
         self.topic:list
         self.predicted_topic:str 
         self.author:str
-        self.content:str = None
-        self.title:str = None
+        self.content:str
+        self.title:str
         self.words:int
         self.keywords:list
         self.summary:str
@@ -25,13 +25,17 @@ class Article(object):
 
     def extractContent(self, raw, attributes):
         for attribute in attributes:
-            func = getattr(Extractor, attribute)
-            setattr(self, attribute, func(raw))
+           func = getattr(Extractor, attribute)
+           res = func(raw)
+           if res:
+                setattr(self, attribute, res)
 
     def extractUrl(self, url, attributes):
         for attribute in attributes:
             func = getattr(Extractor, attribute)
-            setattr(self, attribute, func(url))
+            res = func(url)
+            if res:
+                setattr(self, attribute, res)
 
     def summarize(self):
         summarizor = Summarizor(

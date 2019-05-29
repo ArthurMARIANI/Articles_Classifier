@@ -12,7 +12,8 @@ class Extractor(object):
         parsed_url = url.split("/")
         if len(parsed_url)>1:
             topic = Utils.isWord(parsed_url[1])
-            return topic
+            if topic:
+                return topic
 
     @staticmethod
     def title(raw):
@@ -22,7 +23,6 @@ class Extractor(object):
         2. Reading H1 tags
         """
 
-        title = None
         title_element = raw.title
         if title_element and title_element.string:
             title = title_element.string.lower()
@@ -66,5 +66,3 @@ class Extractor(object):
         if content:
             content_text = '-'.join(content)
             return content_text
-        else:
-            return None

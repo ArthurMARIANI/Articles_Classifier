@@ -36,7 +36,7 @@ class Classifier(object):
             if article and 'keywords' in article and article['keywords']:
                 article['keywords'] = {keyword: article['keywords'][keyword]
                             for keyword in list(article['keywords'])[:int(n_keywords)]}
-                if article and article['topic']:
+                if article and 'topic' in article:
                     self.appendTopic(article['topic'])
 
     def extractTopicsFromKeywords(self, articles):
@@ -94,6 +94,10 @@ class Classifier(object):
                     good +=1
                 else:
                     wrong +=1
-        print('accuracy:', round(good/wrong,2))
+
+        accuracy = 1
+        if wrong != 0:
+            accuracy = round(good/(good+wrong), 3)
+        print('accuracy:', accuracy)
 
 

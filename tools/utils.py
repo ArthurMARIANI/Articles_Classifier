@@ -43,7 +43,6 @@ class Utils(object):
 
             if cleaned:
                 return cleaned
-        return None
     
     @staticmethod
     def checkLength(content):
