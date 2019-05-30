@@ -10,12 +10,24 @@ stopwords = utils.load_stopwords('fr')
 
 class Summarizor(object):
    
-    def __init__(self, title, content):
-        self.title = title
-        self.content = content
 
-    def normalize(self, attribute):
-        text = getattr(self, attribute)
+    def summarizeArticle(self, article):
+        title = ''
+        if hasattr(article, 'title'):
+            title = article.title
+        title = self.normalize(title)
+        if hasattr(article, 'content'):
+            content = self.normalize(article.content)
+            title_keywords = self.getKeywords(title)
+            content_keywords = self.getKeywords(content)
+            if title_keywords and content_keywords:
+                keywords = Utils.merge_two_dicts(
+                    title_keywords[0], content_keywords[0])
+                keywords = Utils.sortDictionary(keywords)
+                article.keywords = Utils.normalize(keywords, 4)
+        return article
+
+    def normalize(self, text):
         if text:
             text = Utils.clean(text)
             result = []
@@ -24,23 +36,11 @@ class Summarizor(object):
                 if not token.is_stop:
                     if token.lemma_ not in stopwords and token.lemma_.isalpha():
                         result.append(token.lemma_)
-            setattr(self, attribute, result)
-        
-    def keywords(self):
-        title_keywords = self.getKeywords(self.title)
-        content_keywords = self.getKeywords(self.content)
-        if title_keywords and content_keywords:
-            keywords = Utils.merge_two_dicts(title_keywords[0], content_keywords[0])
-            keywords = Utils.sortDictionary(keywords)
-            return Utils.normalize(keywords, 4)
+            return result
 
     def getKeywords(self, text):
-        """
-        get the most used keywords
-        """
         if text:
             NUM_KEYWORDS = config.keywords_to_extract
-
             freq = {}
             num_words = len(text)
             for word in text:

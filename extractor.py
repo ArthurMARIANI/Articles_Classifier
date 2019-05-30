@@ -2,13 +2,13 @@ from tools.utils import Utils
 class Extractor(object):
 
     @staticmethod
-    def website(url):
+    def extractWebsite(url):
         parsed_url = url.split("/")
         website = parsed_url[0]
         return website
 
     @staticmethod
-    def topic(url):
+    def extractTopic(url):
         parsed_url = url.split("/")
         if len(parsed_url)>1:
             topic = Utils.isWord(parsed_url[1])
@@ -16,12 +16,7 @@ class Extractor(object):
                 return topic
 
     @staticmethod
-    def title(raw):
-        """
-        Extract the title of the article with this hierarquy :
-        1. In metadata
-        2. Reading H1 tags
-        """
+    def extractTitle(raw):
 
         title_element = raw.title
         if title_element and title_element.string:
@@ -34,10 +29,7 @@ class Extractor(object):
                 return titles_text_H1[0]
 
     @staticmethod
-    def author(raw):
-        """
-        Extract the author of the article using multiple combinations of tags attributes/value
-        """
+    def extractAuthor(raw):
 
         ATTRS = ['name', 'rel', 'itemprop', 'class', 'id']
         VALS = ['author', 'byline', 'dc.creator', 'byl']
@@ -50,12 +42,7 @@ class Extractor(object):
 
 
     @staticmethod
-    def content(raw):
-        """
-        Extract the Content of the article:
-        1. Excluding Footer
-        2. Looking for article Tag
-        """
+    def extractContent(raw):
 
         section = raw
         raw.find_all('footer').clear()

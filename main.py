@@ -1,79 +1,81 @@
 #! /usr/bin/env python3
 import argparse
 import json
-import time
 import os
 
 from models.article import Article
 
 import config
 from crawler import Crawler
+from summarizor import Summarizor
 from classifier import Classifier
 from tools.utils import Utils
 import multiprocessing as mp
 import queue
-from collections import OrderedDict
-from operator import itemgetter
-import itertools
 import multiprocessing
-import numpy as np
 
 utils = Utils()
 manager = mp.Manager()
 crawler = Crawler()
 classifier = Classifier()
+summarizor = Summarizor()
+
+json_file = open('articles.json').read()
+if json_file:
+    previous_articles = json.loads(json_file)
+    existing_articles = previous_articles['number']
+    articles = previous_articles['articles']
+else:
+    existing_articles = 0
+    articles = []
 
 def run(args):
     queue = manager.Queue()
-    existing_articles = crawler.existing_articles
-    pool = mp.Pool(processes=multiprocessing.cpu_count())
+    pool = mp.Pool(processes=multiprocessing.cpu_count())  
     articles_list = utils.filesmanager.read(args.filename).readlines()
     target = min(args.number, len(articles_list))
-    config.iterations = target - existing_articles
-    if config.iterations > 0:
-        if args.url:
-            articles_list = [args.url]
-        for i in range(config.iterations):
+    iterations = target - existing_articles
+    if iterations > 0:
+        for i in range(iterations):
             index = i+existing_articles
             article_url = articles_list[index]
-            pool.apply_async(
-                processRequest, 
+            pool.apply_async(processRequest, 
                 args=(queue, index, article_url),
                 callback=processTreatment)
         pool.close()
         pool.join()
-    classifier.extractTopics(crawler.articles, args.keywords)
-    classifier.filterTopics(args.topics)
-    classifier.extractTopicsFromKeywords(crawler.articles)
-    classifier.normalizeKeywords()
-    classifier.predictTopic(crawler.articles)
-    classifier.score(crawler.articles)
-    utils.filesmanager.write({"number": target,
-                              "articles": crawler.articles
-                              }, 
-                              config.path['json_result'], True
+        json_articles = []
+        for article in articles:
+            json_articles.append(article.asJSON())
+        utils.filesmanager.write({"number": target,
+                                  "articles": json_articles
+                                }, 
+                                config.path['json_result'], True
         )
+    classifier.run( 
+        articles = articles[:args.number], 
+        n_keywords = args.n_keywords, 
+        n_topics = args.n_topics)
 
-def processRequest(queue, i, article_url):
-    res = crawler.getArticle(article_url)
-    element = {
-        'index':i,
-        'res':res
-    }
-    queue.put(element)
+def processRequest(queue, index, article_url):
+    article = crawler.requestArticle(
+        url = article_url, 
+        index = index
+    )
+    queue.put(article)
     return queue
 
 def processTreatment(queue):
     while True:
-        element = queue.get()
-        res = element['res']
-        article = Article( 
-            index=element['index'],
-            url=res.url,
-            status=res.status_code
-        )
+        article = queue.get()
         if article.status == 200:
-            crawler.crawl(article, res)
+            article = crawler.parseArticle(article)
+            article = summarizor.summarizeArticle(article)
+            delattr(article, 'content')
+            delattr(article, 'words')
+        delattr(article, 'raw')
+        delattr(article, 'index')
+        articles.append(article)
         break
 
 def main():
@@ -100,28 +102,19 @@ def main():
 
     parser.add_argument("-t", 
         help = "number of topics expected",
-        dest = "topics", 
+        dest = "n_topics", 
         default = 10,
         required = False
     )
 
     parser.add_argument("-k", 
         help = "number of keywords to use",
-        dest = "keywords", 
+        dest = "n_keywords", 
         default = 10,
         required = False
     )
 
-    group = parser.add_mutually_exclusive_group()
-
-    group.add_argument("-url",
-        help = "url to scrap",
-        dest="url",
-        type = str,
-        required = False
-    )
-
-    group.add_argument("-list",
+    parser.add_argument("-list",
         help = "name of txt file you want to process",
         dest="filename",
         type = str,
