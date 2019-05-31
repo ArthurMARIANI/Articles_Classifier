@@ -1,17 +1,18 @@
+from bs4 import BeautifulSoup
+from extractor import Extractor
+from models.article import Article
+import json
 import requests
 from tools.utils import Utils
-import config
-import json
-from models.article import Article
-from extractor import Extractor
+import config.config
 
-from bs4 import BeautifulSoup
 
 utils = Utils()
 extractor = Extractor()
 
+
 class Crawler(object):
-            
+
     def parseArticle(self, article):
         raw = BeautifulSoup(article.raw, 'html.parser')
         setattr(article, 'title', extractor.extractTitle(raw))
@@ -23,11 +24,11 @@ class Crawler(object):
 
             if hasattr(article, 'topic'):
                 print(article.topic)
-            else :
+            else:
                 print(article.url)
-        
+
         return article
-    
+
     def requestArticle(self, url, index):
         url = utils.cleanUrl(url)
         headers = {
@@ -41,15 +42,14 @@ class Crawler(object):
         }
 
         res = requests.get(
-            url="http://"+url, 
+            url="http://"+url,
             allow_redirects=True,
             headers=headers
         )
 
         return Article(
-            url= res.url,
+            url=res.url,
             status=res.status_code,
-            raw = res.text,
-            index = index
+            raw=res.text,
+            index=index
         )
-        
