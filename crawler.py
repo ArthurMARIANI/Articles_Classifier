@@ -13,17 +13,20 @@ extractor = Extractor()
 class Crawler(object):
             
     def parseArticle(self, article):
-
         raw = BeautifulSoup(article.raw, 'html.parser')
         setattr(article, 'title', extractor.extractTitle(raw))
         setattr(article, 'author', extractor.extractAuthor(raw))
         setattr(article, 'content', extractor.extractContent(raw))
         if hasattr(article, 'content'):
             setattr(article, 'words', Utils.checkLength(article.content))
-            setattr(article, 'website', extractor.extractWebsite(article.url))
             setattr(article, 'topic', extractor.extractTopic(article.url))
-        return article
 
+            if hasattr(article, 'topic'):
+                print(article.topic)
+            else :
+                print(article.url)
+        
+        return article
     
     def requestArticle(self, url, index):
         url = utils.cleanUrl(url)
@@ -44,9 +47,9 @@ class Crawler(object):
         )
 
         return Article(
-            index = index,
             url= res.url,
             status=res.status_code,
-            raw = res.text
+            raw = res.text,
+            index = index
         )
         

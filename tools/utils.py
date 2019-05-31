@@ -30,7 +30,6 @@ class Utils(object):
             for element in elements:
                 [s.extract() for s in element('i')]
                 [s.extract() for s in element('a')]
-
                 content = element.text
                 content = content.replace("\n", '')
                 content = content.replace("\r", '')
@@ -43,6 +42,36 @@ class Utils(object):
 
             if cleaned:
                 return cleaned
+
+    @staticmethod
+    def cleanText(text):
+        from spacy.lang.fr import French
+        spacy = French()
+        stopwords = stopwords = set()
+        with open(path.join(config.path['stopwords_folder'],
+                                            'stopwords-{}.txt'.format(config.language))) as f:
+            stopwords.update(set([w.strip() for w in f.readlines()]))
+        if text:
+            text = text.lower()
+            text = re.sub(r"d'", '', text)
+            text = re.sub(r"l'", '', text)
+            text = re.sub(r"le'", '', text)
+            text = re.sub("\.\.\.", "", text)        
+            text = text.translate(str.maketrans(' ', ' ', string.punctuation))
+            text = unidecode.unidecode(text)
+            result = []
+            doc = spacy(text)
+            for token in doc:
+                if not token.is_stop:
+                    if token.lemma_ not in stopwords and token.lemma_.isalpha():
+                        result.append(token.lemma_)
+            return result
+
+    @staticmethod
+    def split(delimiters, string, maxsplit=0):
+        import re
+        regexPattern = '|'.join(map(re.escape, delimiters))
+        return re.split(regexPattern, string, maxsplit)
     
     @staticmethod
     def checkLength(content):
@@ -90,7 +119,7 @@ class Utils(object):
         if text:
             pattern = re.compile(
                 r"([0-9])|(\.)|(\-)|(\s+)")
-            if not pattern.search(text) and text and len(text)>3:
+            if not pattern.search(text) and text and len(text)>3 and len(text)<10:
                 return text
             else:
                 return False
@@ -120,9 +149,10 @@ class Utils(object):
                 obj[e] = round(math.log(val), 1)
         return dict(obj)
 
-    def load_stopwords(self, language):
+    @staticmethod
+    def load_stopwords(language):
         stopwords = set()
-        with self.filesmanager.read(path.join(config.path['stopwords_folder'],
+        with open(path.join(config.path['stopwords_folder'],
                                             'stopwords-{}.txt'.format(language))) as f:
             stopwords.update(set([w.strip() for w in f.readlines()]))
         return stopwords

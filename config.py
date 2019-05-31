@@ -15,3 +15,4 @@ debug = False
 iterations = 1
 start_time = time.time()
 keywords_to_extract = 20
+language = 'fr'

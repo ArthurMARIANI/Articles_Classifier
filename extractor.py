@@ -1,20 +1,18 @@
 from tools.utils import Utils
+import re
 class Extractor(object):
 
     @staticmethod
-    def extractWebsite(url):
-        parsed_url = url.split("/")
-        website = parsed_url[0]
-        return website
-
-    @staticmethod
     def extractTopic(url):
-        parsed_url = url.split("/")
-        if len(parsed_url)>1:
-            topic = Utils.isWord(parsed_url[1])
-            if topic:
-                return topic
-
+        website = Utils.split(['/','.','-','des','du',],url)[:-1]
+        words = []
+        for word in website:
+            word = Utils.cleanText(word)
+            if word:
+                word = Utils.isWord(word[0])
+                if word:
+                    return word
+            
     @staticmethod
     def extractTitle(raw):
 

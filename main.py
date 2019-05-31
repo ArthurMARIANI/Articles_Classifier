@@ -20,16 +20,28 @@ crawler = Crawler()
 classifier = Classifier()
 summarizor = Summarizor()
 
-json_file = open('articles.json').read()
-if json_file:
-    previous_articles = json.loads(json_file)
-    existing_articles = previous_articles['number']
-    articles = previous_articles['articles']
-else:
-    existing_articles = 0
-    articles = []
+articles = []
 
 def run(args):
+   
+    existing_articles = 0
+    json_file = open('articles.json').read()
+    if json_file and not args.rebuild:
+        previous_articles = json.loads(json_file)
+        existing_articles = previous_articles['number']
+        for json_article in previous_articles['articles']:
+            article = Article(
+                url = json_article['url'],
+                status = json_article['status'],
+                )
+            if 'topic' in json_article:
+                article.topic:list = json_article['topic']
+            if 'title' in json_article:
+                article.title:str = json_article['title']
+            if 'keywords' in json_article:
+                article.keywords:list = json_article['keywords']
+            articles.append(article)
+
     queue = manager.Queue()
     pool = mp.Pool(processes=multiprocessing.cpu_count())  
     articles_list = utils.filesmanager.read(args.filename).readlines()
@@ -74,6 +86,8 @@ def processTreatment(queue):
             delattr(article, 'content')
             delattr(article, 'words')
         delattr(article, 'raw')
+        if not config.debug:
+            utils.printJson(article.asJSON())
         delattr(article, 'index')
         articles.append(article)
         break
@@ -100,12 +114,22 @@ def main():
         required = False
     )
 
+    parser.add_argument("-r", 
+        help = "rebuild previous database",
+        action = "store_const",
+        dest = "rebuild", 
+        const = True, 
+        default = False,
+        required = False
+    )
+
     parser.add_argument("-t", 
         help = "number of topics expected",
         dest = "n_topics", 
         default = 10,
         required = False
     )
+
 
     parser.add_argument("-k", 
         help = "number of keywords to use",
