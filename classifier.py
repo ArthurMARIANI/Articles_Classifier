@@ -17,16 +17,12 @@ class Classifier(object):
         print('CLASSIFIER')
         self.train = articles[:int(len(articles) * 0.8)-1]
         self.test = articles[:int(len(articles) * -0.2)-1]
-        for n_topics in range(2, 21):
-            for n_keywords in range(2, 10):
+        for n_topics in range(15, 16):
+            for n_keywords in range(2, 3):
                 self.extractTopics(n_topics)
+                for topic in self.topics:
+                    print(topic)
                 self.extractKeywords(n_keywords)
-                n = 0
-                for keyword in self.keywords:
-                    if self.keywords[keyword]:
-                        # print(keyword, self.keywords[keyword])
-                        n += 1
-                # print(n)
                 self.predictTopic(n_keywords)
                 self.score(n_keywords, n_topics)
         self.optimise(self.scores)
@@ -57,6 +53,8 @@ class Classifier(object):
             if article and hasattr(article, 'keywords'):
                 if hasattr(article, 'topic') and article.topic is not None:
                     self.appendTopic(article.topic)
+                    print(article.topic)
+                    print(article.url)
                 else:
                     self.not_labeled.append(article)
         topics = sorted(
@@ -106,8 +104,6 @@ class Classifier(object):
         accuracy = 1
         if wrong != 0:
             accuracy = round(good/(good+wrong), 3)
-
-        print(n_keywords, "-", n_topics,  "-", accuracy)
 
         self.scores.append(
             {"score": accuracy,

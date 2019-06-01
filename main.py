@@ -8,6 +8,7 @@ from summarizor import Summarizor
 from classifier import Classifier
 from tools.utils import Utils
 from collections import OrderedDict
+from extractor import Extractor
 import multiprocessing as mp
 import queue
 import os
@@ -18,8 +19,10 @@ manager = mp.Manager()
 crawler = Crawler()
 classifier = Classifier()
 summarizor = Summarizor()
+extractor = Extractor()
 
 articles = []
+articles_json = []
 
 
 def run(args):

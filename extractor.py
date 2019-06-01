@@ -1,5 +1,6 @@
 from tools.utils import Utils
 import re
+import string
 
 
 class Extractor(object):
@@ -12,11 +13,9 @@ class Extractor(object):
             if word:
                 word = Utils.isWord(word[0])
                 if word:
-                   # print(word)
                     return word
                 else:
                     pass
-                   # print(website)
 
     @staticmethod
     def extractTitle(raw):
@@ -47,7 +46,21 @@ class Extractor(object):
         raw.find_all('footer').clear()
         if raw.find('article'):
             section = raw.find('article')
-        content = Utils.cleaner(section.find_all("p"))
-        if content:
-            content_text = '-'.join(content)
-            return content_text
+        elements = section.find_all("p")
+        cleaned = []
+        if elements:
+            for element in elements:
+                [s.extract() for s in element('i')]
+                [s.extract() for s in element('a')]
+                content = element.text
+                content = content.replace("\n", '')
+                content = content.replace("\r", '')
+                cleaning_content = content
+                for c in string.punctuation:
+                    cleaning_content = cleaning_content.replace(c, "")
+                if(cleaning_content.split()):
+                    cleaned.append(content)
+
+            if cleaned:
+                content_text = '-'.join(cleaned)
+                return content_text

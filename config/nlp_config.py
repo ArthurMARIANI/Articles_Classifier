@@ -7,6 +7,7 @@ clean_patterns = [
 
 rejected = [
     "faq",
+    "femme",
     "forum",
     "content",
     "recherche",
@@ -59,7 +60,6 @@ synonimous = {
     "dictionnaire": "langue",
     "conjugaison": "langue",
     "citation": "langue",
-    "femme": "lifestyle",
     "mode": "lifestyle",
     "beaute": "lifestyle",
     "spectacle": "lifestyle",

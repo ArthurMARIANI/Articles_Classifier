@@ -21,12 +21,6 @@ class Crawler(object):
         if hasattr(article, 'content'):
             setattr(article, 'words', Utils.checkLength(article.content))
             setattr(article, 'topic', extractor.extractTopic(article.url))
-
-            if hasattr(article, 'topic'):
-                print(article.topic)
-            else:
-                print(article.url)
-
         return article
 
     def requestArticle(self, url, index):
@@ -48,7 +42,7 @@ class Crawler(object):
         )
 
         return Article(
-            url=res.url,
+            url=utils.cleanUrl(res.url),
             status=res.status_code,
             raw=res.text,
             index=index
