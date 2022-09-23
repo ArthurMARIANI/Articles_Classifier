@@ -71,7 +71,7 @@ populartimes==2.0
 preshed==2.0.1
 prometheus-client==0.5.0
 prompt-toolkit==2.0.8
-protobuf==3.6.1
+protobuf==3.18.3
 ptyprocess==0.6.0
 pycodestyle==2.4.0
 pygame==1.9.4
